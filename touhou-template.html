@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>東方風テンプレ — Am・160BPM・16小節</title>
+<style>
+  body{margin:0;background:#14101a;color:#f2ead8;font-family:system-ui,sans-serif}
+  main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+  h1{font-size:22px;margin:8px 0 4px;color:#ff5a5a}
+  h2{font-size:17px;margin:28px 0 8px;color:#ffd166;border-bottom:1px solid #444}
+  p,li{line-height:1.7;font-size:15px}
+  .card{background:#1f1826;border:1px solid #3a2f4a;border-radius:10px;padding:14px;margin:14px 0}
+  button{font-size:16px;padding:10px 18px;border-radius:8px;border:0;background:#c44527;color:#fff;cursor:pointer;margin:4px 6px 4px 0}
+  button.stop{background:#555}
+  label{display:inline-block;margin:6px 12px 6px 0;font-size:15px}
+  input[type=range]{vertical-align:middle}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{border:1px solid #444;padding:5px 6px;text-align:left}
+  th{background:#2a2133}
+  tr.now td{background:#4a2a2a}
+  code{background:#0006;padding:1px 5px;border-radius:4px}
+  .small{font-size:13px;color:#cbb}
+</style>
+</head>
+<body>
+<main>
+<h1>東方風テンプレ</h1>
+<p>Am（イ短調）・BPM 160・4/4・16小節。Aメロ（1〜8小節）＋Bメロ／サビ（9〜16小節）、ループするよ。オリジナルメロディーだから、そのまま自分の曲の土台にしてOK。</p>
+
+<div class="card">
+  <button id="playBtn">▶ 再生</button>
+  <button id="stopBtn" class="stop">■ 停止</button>
+  <div>
+    <label>BPM <input id="bpm" type="range" min="120" max="180" value="160" step="1"> <span id="bpmVal">160</span></label>
+  </div>
+  <div>
+    <label>区間
+      <select id="section">
+        <option value="all">A+B（全16小節・ループ）</option>
+        <option value="a">Aだけ（1〜8小節）</option>
+        <option value="b">Bだけ（9〜16小節）</option>
+      </select>
+    </label>
+  </div>
+  <div>
+    <label><input type="checkbox" id="useLead" checked> リード（トランペット風）</label>
+    <label><input type="checkbox" id="usePiano" checked> ピアノ（コード）</label>
+    <label><input type="checkbox" id="useBass" checked> ベース</label>
+    <label><input type="checkbox" id="useDrums" checked> ドラム</label>
+  </div>
+  <p class="small">今：<span id="now">停止中</span></p>
+</div>
+
+<h2>コードとメロディー（全16小節）</h2>
+<p class="small">コードは1小節に1つ。メロディーは U.N.オーエン型＝最初からはっきりしてて、繰り返せる形にしてあるよ。</p>
+<table id="sheet"><thead><tr><th>小節</th><th>コード</th><th>メロディー</th></tr></thead><tbody></tbody></table>
+
+<h2>変えるところ（ここだけいじればいい）</h2>
+<ol>
+  <li><code>MELODY</code> の数字を変える → メロディーが変わる。音の数字は下の表を見てね。69=A4、72=C5、76=E5、81=A5、84=C6。</li>
+  <li><code>CHORDS</code> の名前を変える → コードが変わる。Am→F→C→G→Am→F→Dm→E が基本の並び。</li>
+  <li>BPMスライダーを動かす → 速さだけ変わる。140〜180で東方っぽさが変わるよ。</li>
+</ol>
+<p>最初のおすすめ：<b>1音だけ変える</b>。たとえば16小節目の最後の音（69=A）を72=Cにしてみる。たった1音で、終わり方が変わるのがわかるよ。</p>
+
+<h2>このテンプレの型</h2>
+<ul>
+  <li><b>キー：</b>Am。A・B・C・D・E・F・G だけ使う（白鍵の音）。Eコードの時だけ G#（68）が出てくる＝和声的短音階のドミナント。</li>
+  <li><b>コード：</b>Am - F - C - G - Am - F - Dm - E を2回。i - VI - III - VII - i - VI - iv - V。</li>
+  <li><b>メロディー：</b>ほとんど順次進行（隣の音へ）で、たまに大きく跳ぶ。Aメロは低め、Bメロは高めで、最後は下がって A に戻る。</li>
+  <li><b>ベース：</b>8分で刻み続ける。ルート→ルート→5度→ルート…の繰り返し。</li>
+  <li><b>ドラム：</b>キック4つ打ち、スネアは2・4拍目、ハイハットは8分。</li>
+</ul>
+<p class="small">同じ曲のMIDI版（touhou-template.mid）もあるよ。MIDI Rhythm に読み込めば、譜面にしたり、音を変えたりできる。</p>
+</main>
+
+<script>
+"use strict";
+// ===== ここがテンプレの本体。変えるのはここだけ =====
+// 音の数字: 69=A4, 71=B4, 72=C5, 74=D5, 76=E5, 77=F5, 79=G5, 81=A5, 83=B5, 84=C6
+// [音, 長さ(8分音符の数)]。1小節の合計は必ず8にすること。
+const MELODY = [
+  [[69,1],[72,1],[76,2],[81,2],[79,1],[76,1]],
+  [[74,2],[72,1],[71,1],[72,2],[69,2]],
+  [[69,1],[72,1],[76,2],[79,2],[81,1],[79,1]],
+  [[76,4],[74,2],[72,2]],
+  [[77,2],[76,1],[74,1],[76,2],[72,2]],
+  [[74,2],[76,2],[77,2],[76,2]],
+  [[81,2],[79,1],[77,1],[76,2],[74,2]],
+  [[72,2],[71,2],[69,4]],
+  [[81,1],[84,1],[81,2],[79,2],[76,2]],
+  [[77,2],[79,2],[81,4]],
+  [[84,2],[83,1],[81,1],[79,2],[76,2]],
+  [[74,4],[76,4]],
+  [[77,1],[76,1],[74,1],[72,1],[74,2],[76,2]],
+  [[77,2],[76,2],[74,2],[72,2]],
+  [[72,2],[74,2],[76,2],[81,2]],
+  [[76,2],[74,2],[72,2],[71,1],[69,1]],
+];
+// [コード名, ベースの音, ピアノの和音]
+const CHORDS = [
+  ["Am",45,[57,60,64]], ["F",41,[53,57,60]], ["C",48,[60,64,67]], ["G",43,[59,62,67]],
+  ["Am",45,[57,60,64]], ["F",41,[53,57,60]], ["Dm",50,[57,62,65]], ["E",40,[59,64,68]],
+  ["Am",45,[57,60,64]], ["F",41,[53,57,60]], ["C",48,[60,64,67]], ["G",43,[59,62,67]],
+  ["Am",45,[57,60,64]], ["F",41,[53,57,60]], ["Dm",50,[57,62,65]], ["E",40,[59,64,68]],
+];
+// ===== ここから下は再生の仕組み。ふつうはいじらなくてOK =====
+const NAMES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const noteName = m => NAMES[m % 12] + (Math.floor(m / 12) - 1);
+const midiHz = m => 440 * Math.pow(2, (m - 69) / 12);
+
+// 楽譜テーブルを作る
+const tbody = document.querySelector("#sheet tbody");
+MELODY.forEach((bar, i) => {
+  const tr = document.createElement("tr");
+  tr.id = "bar" + i;
+  const mel = bar.map(([m, d]) => noteName(m) + (d > 1 ? "×" + d : "")).join(" ");
+  tr.innerHTML = "<td>" + (i + 1) + (i < 8 ? " (A)" : " (B)") + "</td><td>" + CHORDS[i][0] + "</td><td>" + mel + "</td>";
+  tbody.appendChild(tr);
+});
+
+let ac = null, noiseBuf = null, timer = null, step = 0, nextTime = 0, playing = false;
+const $ = id => document.getElementById(id);
+$("bpm").addEventListener("input", e => { $("bpmVal").textContent = e.target.value; });
+
+function ensureAudio() {
+  if (ac) return;
+  ac = new (window.AudioContext || window.webkitAudioContext)();
+  noiseBuf = ac.createBuffer(1, ac.sampleRate * 0.5, ac.sampleRate);
+  const d = noiseBuf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+}
+function tone(freq, t, dur, type, vol, cutoff) {
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = type; o.frequency.value = freq;
+  if (cutoff) { const f = ac.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = cutoff; o.connect(f); f.connect(g); }
+  else o.connect(g);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t + 0.02);
+  g.gain.setValueAtTime(vol, t + Math.max(0.02, dur - 0.08));
+  g.gain.linearRampToValueAtTime(0, t + dur);
+  o.start(t); o.stop(t + dur + 0.05);
+  g.connect(ac.destination);
+}
+function drum(kind, t, vol) {
+  if (kind === "kick") {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = "sine"; o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(50, t + 0.12);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+    o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + 0.2);
+  } else {
+    const s = ac.createBufferSource(); s.buffer = noiseBuf;
+    const f = ac.createBiquadFilter(), g = ac.createGain();
+    f.type = kind === "snare" ? "bandpass" : "highpass"; f.frequency.value = kind === "snare" ? 1800 : 7000;
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + (kind === "snare" ? 0.15 : 0.04));
+    s.connect(f); f.connect(g); g.connect(ac.destination); s.start(t); s.stop(t + 0.2);
+  }
+}
+// 8分音符1ステップ分を鳴らす
+function playStep(bar, eighth, t, eighthDur) {
+  const chord = CHORDS[bar];
+  if ($("useDrums").checked) {
+    if (eighth % 2 === 0) drum("kick", t, 0.5);
+    if (eighth === 2 || eighth === 6) drum("snare", t, 0.35);
+    drum("hat", t, 0.12);
+  }
+  if ($("useBass").checked) {
+    const pat = [0, 0, 7, 0, 0, 7, 0, 12];
+    tone(midiHz(chord[1] + pat[eighth]), t, eighthDur * 0.95, "square", 0.16, 600);
+  }
+  if ($("usePiano").checked && (eighth === 0 || eighth === 4)) {
+    chord[2].forEach(n => tone(midiHz(n), t, eighthDur * 3.6, "triangle", 0.10));
+  }
+  if ($("useLead").checked) {
+    // このステップから始まるメロディー音を探す
+    let pos = 0;
+    for (const [m, d] of MELODY[bar]) {
+      if (pos === eighth) { tone(midiHz(m), t, eighthDur * d * 0.92, "sawtooth", 0.20, 2600); break; }
+      pos += d;
+    }
+  }
+}
+function range() {
+  const s = $("section").value;
+  return s === "a" ? [0, 8] : s === "b" ? [8, 16] : [0, 16];
+}
+function scheduler() {
+  if (!playing) return;
+  const bpm = +$("bpm").value, eighthDur = 60 / bpm / 2;
+  const [startBar, endBar] = range();
+  const totalSteps = (endBar - startBar) * 8;
+  while (nextTime < ac.currentTime + 0.12) {
+    const bar = startBar + Math.floor(step / 8), eighth = step % 8;
+    playStep(bar, eighth, nextTime, eighthDur);
+    document.querySelectorAll("#sheet tr").forEach(tr => tr.classList.remove("now"));
+    const row = document.getElementById("bar" + bar);
+    if (row) row.classList.add("now");
+    $("now").textContent = (bar + 1) + "小節目・" + CHORDS[bar][0] + "・BPM " + bpm;
+    nextTime += eighthDur;
+    step = (step + 1) % totalSteps;
+  }
+}
+$("playBtn").addEventListener("click", () => {
+  ensureAudio();
+  if (ac.state === "suspended") ac.resume();
+  if (playing) return;
+  playing = true; step = 0; nextTime = ac.currentTime + 0.06;
+  timer = setInterval(scheduler, 25);
+  $("playBtn").textContent = "▶ 再生中…";
+});
+$("stopBtn").addEventListener("click", () => {
+  playing = false; if (timer) clearInterval(timer); timer = null;
+  $("playBtn").textContent = "▶ 再生";
+  $("now").textContent = "停止中";
+  document.querySelectorAll("#sheet tr").forEach(tr => tr.classList.remove("now"));
+});
+</script>
+</body>
+</html>
